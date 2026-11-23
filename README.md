@@ -20,7 +20,16 @@ Seven modules plus a closing one, *What I bring to the team*:
 6. Statistics without fear
 7. Decide together
 
-Along the way: diagrams, hospitality examples and interactive parts, such as a hospitality / people view of the wastes and a clickable 5 Whys.
+Each module goes into the technical side in plain words: DPMO and sigma levels, rolled throughput yield, value stream maps, kanban, poka-yoke, Kano, CTQ trees, fishbone diagrams, takt time, Little's law, FMEA with RPN, control plans, DMADV, process capability (Cp and Cpk), control chart rules, measurement system analysis, hypothesis tests, regression, designed experiments, decision matrices and team stages.
+
+Along the way: diagrams, hospitality examples and interactive parts:
+
+- a hospitality / people view of the wastes
+- a clickable 5 Whys
+- a takt time calculator for housekeeping
+- a process capability simulator: move the average and the spread and see Cp, Cpk and guests out of range
+
+The PDF is the shorter, earlier version of the page.
 
 Available in English and Italian.
 
