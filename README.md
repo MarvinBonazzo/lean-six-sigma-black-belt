@@ -8,6 +8,10 @@ The idea: every tool is applied twice, once to hospitality processes and once to
 - **Italian version:** https://marvinbonazzo.github.io/lean-six-sigma-black-belt/#it
 - **PDF:** [Lean-Six-Sigma-Black-Belt.pdf](Lean-Six-Sigma-Black-Belt.pdf)
 
+## The comic
+
+The same lessons told as a short comic, step by step: [lean-six-sigma-black-belt/fumetto.html](https://marvinbonazzo.github.io/lean-six-sigma-black-belt/fumetto.html) (Italian and English, use the ← → arrow keys or swipe). The story, characters and drawings are made up.
+
 ## What's inside
 
 Seven modules plus a closing one, *What I bring to the team*:

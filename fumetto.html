@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il check-in delle 15</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,700;0,800;1,400&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+/* A comic told one step at a time on a dark stage: each arrow press adds one caption, one bubble or one insight card. */
+:root{color-scheme:dark;--bg:#16130f;--ink:#2b2620;--paper:#fff;--txt:#f4efe6;--txt-soft:rgba(244,239,230,.62);--acc:#2f7f76;--acc-soft:#d6eee9;--yel:#fff3a8}
+*{box-sizing:border-box;margin:0;padding:0;min-width:0}
+html,body{height:100%}
+body{font-family:Figtree,system-ui,sans-serif;color:var(--txt);background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
+.prog{position:fixed;left:0;right:0;bottom:0;height:5px;background:var(--acc);transform-origin:0 50%;transform:scaleX(0);transition:transform .45s ease;z-index:20}
+.topbar{position:fixed;top:14px;right:14px;z-index:25}
+.lang{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16)}
+.lang button{font:inherit;font-size:.8rem;letter-spacing:.12em;color:var(--txt-soft);background:none;border:0;border-radius:999px;min-width:42px;min-height:32px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--txt);color:var(--bg)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+/* screens */
+#story{position:fixed;inset:0}
+.scr{position:absolute;inset:0;display:grid;place-items:center;padding:58px 16px 64px;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s .45s}
+.scr.on{opacity:1;visibility:visible;transition:opacity .45s ease}
+.scr::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(90vmax 70vmax at 50% 42%,color-mix(in srgb,var(--glow,#3a3128) 20%,transparent),transparent 60%)}
+/* beat */
+.chip{position:absolute;top:16px;left:16px;right:120px;display:flex;align-items:center;gap:10px;font-size:.86rem;color:var(--txt-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip span{flex:none;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--txt);background:color-mix(in srgb,var(--acc) 70%,transparent);padding:4px 10px;border-radius:999px}
+.box{position:relative;display:grid;gap:16px;width:min(1080px,100%,calc((100svh - 150px) * 1.538))}
+.box.n2{grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:min(1180px,100%,calc((100svh - 150px) * 3.1))}
+@media(max-aspect-ratio:1/1){.box.n2{grid-template-columns:minmax(0,1fr);width:min(100%,calc((100svh - 190px) / 2 * 1.538))}}
+.panel{border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 30px 80px -24px rgba(0,0,0,.75),0 0 0 2px rgba(0,0,0,.35)}
+.panel svg{display:block;width:100%;height:auto}
+.narr{position:absolute;left:clamp(-44px,-3vw,-8px);bottom:clamp(-30px,-2.6vw,-16px);display:flex;align-items:flex-end;gap:4px;max-width:min(84%,560px);z-index:2;pointer-events:none}
+.narr .av{flex:none;width:clamp(56px,7vw,86px);height:auto;border-radius:50%;background:var(--acc-soft);border:2.5px solid var(--ink);box-shadow:0 8px 20px -8px rgba(0,0,0,.6)}
+.narr .nb{position:relative;margin:0 0 clamp(18px,2.4vw,30px) 8px;background:#fff;color:var(--ink);border:2.4px solid var(--ink);border-radius:14px;padding:6px 12px 7px;font-family:"Patrick Hand",sans-serif;font-size:clamp(1.05rem,2.2vw,1.45rem);line-height:1.2;box-shadow:3px 3px 0 var(--ink)}
+.narr .nb::before{content:"";position:absolute;left:-15px;bottom:8px;border:8px solid transparent;border-right:14px solid var(--ink);border-left:0}
+.narr .nb::after{content:"";position:absolute;left:-9px;bottom:10.5px;border:5.5px solid transparent;border-right:10px solid #fff;border-left:0}
+@media(max-width:600px){.narr{left:-4px;bottom:auto;top:calc(100% + 10px);max-width:100%;align-items:center}.narr .nb{margin:0 0 0 8px}.narr .nb::before{bottom:auto;top:50%;margin-top:-8px}.narr .nb::after{bottom:auto;top:50%;margin-top:-5.5px}}
+/* narrator: big and centred over the darkened scene, then he steps away */
+.box::after{content:"";position:absolute;inset:-2px;border-radius:20px;background:rgba(12,10,8,.6);opacity:0;transition:opacity .4s ease;pointer-events:none;z-index:2}
+.narr-on .box::after{opacity:1}
+.narr-c{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 6%;opacity:0;visibility:hidden;transform:scale(.96);transition:opacity .35s ease,transform .4s cubic-bezier(.2,.8,.2,1),visibility 0s .4s;pointer-events:none}
+.narr-on .narr-c{opacity:1;visibility:visible;transform:none;transition:opacity .35s ease,transform .4s cubic-bezier(.2,.8,.2,1)}
+.narr-c .av{width:clamp(100px,21vh,190px);height:auto;border-radius:50%;background:var(--acc-soft);border:3px solid var(--ink);box-shadow:0 0 0 4px rgba(255,255,255,.14),0 14px 30px -10px rgba(0,0,0,.6)}
+.narr-c .nb{position:relative;max-width:min(100%,640px);background:#fff;color:var(--ink);border:2.6px solid var(--ink);border-radius:18px;padding:clamp(12px,1.8vw,20px) clamp(16px,2.4vw,26px);font-family:"Patrick Hand",sans-serif;font-size:clamp(1.15rem,2.4vw,1.75rem);line-height:1.28;text-align:center;box-shadow:4px 4px 0 #000}
+.narr-c .nb::before{content:"";position:absolute;left:calc(50% - 10px);top:-18px;border:10px solid transparent;border-bottom:17px solid var(--ink);border-top:0}
+.narr-c .nb::after{content:"";position:absolute;left:calc(50% - 7px);top:-11px;border:7px solid transparent;border-bottom:13px solid #fff;border-top:0}
+@media(max-width:600px){.narr-c{inset:-70px -4px;padding:0}.narr-c .av{width:76px}}
+/* bubbles appear one at a time */
+.bub{display:block;position:relative;max-width:100%;background:#fff;border:2.4px solid var(--ink);border-radius:16px;padding:7px 11px 8px;font-family:"Patrick Hand",Figtree,sans-serif;font-size:15.5px;line-height:1.2;color:var(--ink);opacity:0;transform:translateY(8px) scale(.96);transform-origin:var(--tx) 100%;transition:opacity .3s ease,transform .35s cubic-bezier(.2,.8,.2,1.2)}
+.bub.in{opacity:1;transform:none}
+@media(max-width:520px){.bub{font-size:17.5px;line-height:1.12;padding:6px 9px 7px}}
+.bub b{color:var(--acc);font-weight:400}
+.bub::before{content:"";position:absolute;left:calc(var(--tx) - 9px);bottom:-14px;border:9px solid transparent;border-top:14px solid var(--ink);border-bottom:0}
+.bub::after{content:"";position:absolute;left:calc(var(--tx) - 6px);bottom:-9.5px;border:6px solid transparent;border-top:10px solid #fff;border-bottom:0}
+.bub.think{border-radius:22px;border-style:dashed}
+.bub.think::before{width:10px;height:10px;border-radius:50%;border:2.4px solid var(--ink);background:#fff;left:calc(var(--tx) - 6px);bottom:-16px}
+.bub.think::after{width:6px;height:6px;border-radius:50%;border:2px solid var(--ink);background:#fff;left:calc(var(--tx) - 1px);bottom:-27px}
+.bub.shout{background:#fff4d6;border-width:3px}
+.plab{display:inline-block;background:var(--yel);border:2px solid var(--ink);border-radius:4px;padding:3px 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+/* insight card over the dimmed scene */
+.dim{position:absolute;inset:0;background:rgba(12,10,8,.62);opacity:0;transition:opacity .4s ease;pointer-events:none;z-index:3}
+.ins{position:absolute;z-index:4;right:max(16px,5vw);top:50%;width:min(420px,calc(100% - 32px));background:#fff;color:var(--ink);border-radius:16px;padding:18px 20px 20px;box-shadow:0 30px 70px -20px rgba(0,0,0,.8);opacity:0;visibility:hidden;transform:translateY(calc(-50% + 16px));transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s .45s}
+.insight .dim{opacity:1}
+.insight .ins{opacity:1;visibility:visible;transform:translateY(-50%);transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.ik{display:flex;align-items:center;gap:7px;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-bottom:6px}
+.ik svg{width:18px;height:18px}
+.ik em{margin-left:auto;font-style:normal;font-weight:500;letter-spacing:.04em;text-transform:none;font-size:.78rem;color:#7a7064;border:1px solid #d9d2c5;border-radius:999px;padding:2px 9px}
+.ins h3{font-size:1.45rem;font-weight:800;line-height:1.15;margin-bottom:8px;letter-spacing:-.01em}
+.ins p:last-child{font-size:1rem;line-height:1.55;color:#4d453c}
+@media(max-width:700px){.ins{right:16px;left:16px;width:auto;top:auto;bottom:74px;transform:translateY(16px)}.insight .ins{transform:none}}
+/* intro */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:760px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--txt);background:color-mix(in srgb,var(--acc) 55%,transparent);padding:6px 13px 6px 10px;border-radius:999px}
+.tag svg{width:16px;height:16px}
+.hero h1{font-weight:800;font-size:clamp(2.4rem,7vw,4.2rem);line-height:1.02;letter-spacing:-.02em;margin:14px 0 6px}
+.tl{font-style:italic;font-size:clamp(1.1rem,2.6vw,1.5rem);color:var(--txt-soft)}
+.dur{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-soft)}
+.dur svg{width:15px;height:15px}
+.host{display:flex;align-items:center;gap:14px;margin-top:18px;text-align:left;max-width:720px}
+.herofig{flex:none;width:clamp(112px,18vh,168px);height:auto;border-radius:50%;background:var(--acc-soft);border:3px solid var(--ink);box-shadow:0 0 0 4px rgba(255,255,255,.12),0 18px 30px -10px rgba(0,0,0,.6)}
+.hello{position:relative;background:#fff;color:var(--ink);border:2.4px solid var(--ink);border-radius:18px;padding:12px 16px 13px;font-family:"Patrick Hand",sans-serif;font-size:clamp(1.08rem,2.1vw,1.32rem);line-height:1.28;box-shadow:4px 4px 0 #000}
+.hello::before{content:"";position:absolute;left:-17px;top:38%;border:9px solid transparent;border-right:16px solid var(--ink);border-left:0}
+.hello::after{content:"";position:absolute;left:-11px;top:calc(38% + 3px);border:6px solid transparent;border-right:12px solid #fff;border-left:0}
+@media(max-width:600px){.host{flex-direction:column;gap:12px;text-align:left}.herofig{width:96px}.hello::before{left:calc(50% - 9px);top:-17px;border:9px solid transparent;border-bottom:16px solid var(--ink);border-top:0}.hello::after{left:calc(50% - 6px);top:-11px;border:6px solid transparent;border-bottom:12px solid #fff;border-top:0}}
+.desc{font-size:clamp(.95rem,1.8vw,1.05rem);line-height:1.5;color:var(--txt-soft);max-width:56ch}
+.note-y{background:var(--yel);color:var(--ink);border:2px solid var(--ink);padding:6px 11px;font-size:.92rem;line-height:1.3;max-width:220px;box-shadow:3px 3px 0 #000;transform:rotate(-.6deg)}
+.note-y b{font-weight:800}
+/* intro: only Marvin, big */
+.host.big{display:flex;flex-direction:column;align-items:center;gap:22px;max-width:760px;margin:0 auto;text-align:center}
+.host.big .herofig{width:clamp(150px,28vh,250px)}
+.host.big .hello{font-size:clamp(1.25rem,2.4vw,1.75rem);line-height:1.32;padding:clamp(16px,2.2vw,24px) clamp(18px,2.6vw,30px)}
+.host.big .hello::before{left:calc(50% - 10px);top:-18px;border:10px solid transparent;border-bottom:17px solid var(--ink);border-top:0}
+.host.big .hello::after{left:calc(50% - 7px);top:-11px;border:7px solid transparent;border-bottom:13px solid #fff;border-top:0}
+@media(max-width:600px){.host.big .herofig{width:130px}}
+/* keyboard hint, always bottom right; lights up when someone tries something else */
+.hint{position:fixed;right:16px;bottom:72px;z-index:21;display:grid;justify-items:end;gap:8px;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease,visibility 0s .3s}
+.hint.nudge{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease}
+.kb{width:118px;height:auto;display:block;transition:transform .2s}
+.hint .note-y{transform:rotate(-.6deg)}
+.hint.nudge .kl,.hint.nudge .kr{animation:keyflash .5s ease-in-out 4}
+.hint.nudge .kb{animation:keybump .5s ease-in-out 4}
+@keyframes keyflash{50%{fill:#ffe14d}}
+@keyframes keybump{50%{transform:scale(1.08)}}
+.nav.nudge button:not(:disabled){animation:btnflash .5s ease-in-out 4}
+@keyframes btnflash{50%{background:rgba(255,225,77,.45)}}
+@media(hover:none) and (pointer:coarse){.hint .keys{display:none}}
+/* end */
+.endc{display:grid;justify-items:center;text-align:center;gap:16px;max-width:620px}
+.endc h2{font-weight:800;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1.05;letter-spacing:-.02em}
+.endc>p:not(.fine){font-size:1.12rem;line-height:1.55;color:var(--txt-soft)}
+.btn{display:inline-flex;align-items:center;min-height:52px;padding:12px 24px;border-radius:999px;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;font-size:1.06rem;box-shadow:0 14px 30px -12px color-mix(in srgb,var(--acc) 80%,transparent);transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.again{font:inherit;font-size:.95rem;color:var(--txt-soft);background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px}
+.fine{font-size:.76rem;line-height:1.5;color:rgba(244,239,230,.45);max-width:60ch}
+/* nav */
+.nav{position:fixed;right:max(10px,2vw);bottom:14px;display:flex;gap:6px;z-index:22}
+.nav button{width:50px;height:50px;border-radius:50%;border:0;background:none;color:var(--txt);cursor:pointer;display:grid;place-items:center;transition:background .2s,opacity .2s}
+.nav button svg{width:30px;height:30px}
+.nav button:hover:not(:disabled){background:rgba(255,255,255,.1)}
+.nav button:disabled{opacity:.25;cursor:default}
+.at-start #next{background:rgba(255,255,255,.12);animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@media(prefers-reduced-motion:reduce){.narr-c,.narr-on .narr-c,.box::after,.scr,.scr.on,.dim,.ins,.insight .ins,.bub{transition:none}.bub{transform:none}.at-start #next,.hint.nudge .kb{animation:none}.prog{transition:none}}
+</style>
+</head>
+<body class="at-start">
+<div class="topbar"><div class="lang" role="group" aria-label="Lingua / Language"><button type="button" data-lang="it" aria-pressed="true">IT</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div></div>
+<main id="story" aria-live="polite"></main>
+<nav class="nav"><button type="button" id="prev" aria-label="Indietro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" id="next" aria-label="Avanti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></nav>
+<div class="hint" id="hint" aria-hidden="true"></div>
+<div class="prog" id="prog"></div>
+<script>
+// Comic engine: characters, scenes, bubbles, chapters. Story files define CAST and STORY.
+const INK = '#2b2620';
+const SW = 'stroke="' + INK + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+let LANG = 'it';
+const tr = v => (v && typeof v === 'object' && ('it' in v || 'en' in v)) ? v[LANG] : (typeof v === 'function' ? v(LANG) : v);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// ---------- characters ----------
+const ARMS = {
+  down: [['M26 96 Q18 124 22 150', 22, 152], ['M74 96 Q82 124 78 150', 78, 152]],
+  wave: [['M26 96 Q18 124 22 150', 22, 152], ['M74 96 Q94 86 90 58', 90, 54]],
+  point: [['M26 96 Q18 124 22 150', 22, 152], ['M74 96 Q94 102 106 92', 108, 90]],
+  think: [['M26 96 Q30 126 50 120', 52, 118], ['M74 96 Q84 80 63 66', 61, 64]],
+  shrug: [['M26 96 Q8 112 14 86', 14, 82], ['M74 96 Q92 112 86 86', 86, 82]],
+  cross: [['M26 96 Q32 124 66 114', 66, 114], ['M74 96 Q68 124 34 114', 34, 114]],
+  hold: [['M26 96 Q18 124 22 150', 22, 152], ['M74 96 Q80 124 60 118', 58, 116]],
+  phone: [['M26 96 Q28 124 44 114', 44, 113], ['M74 96 Q72 124 56 114', 56, 113]],
+  hips: [['M26 96 Q6 116 24 130', 24, 130], ['M74 96 Q94 116 76 130', 76, 130]],
+  cheer: [['M26 96 Q12 72 14 48', 14, 44], ['M74 96 Q88 72 86 48', 86, 44]],
+  write: [['M26 96 Q26 126 42 120', 44, 118], ['M74 96 Q76 128 58 124', 58, 122]]
+};
+const PROPS = {
+  cup: (x, y) => `<g transform="translate(${x - 8} ${y - 18})"><path d="M14 4 q8 0 8 7 q0 7 -8 7" fill="none" ${SW}/><rect x="0" y="0" width="15" height="19" rx="3" fill="#fff" ${SW}/><path d="M4 -5 q2 -3 0 -6 M9 -5 q2 -3 0 -6" fill="none" stroke="#b9ab98" stroke-width="1.6"/></g>`,
+  phone: () => `<rect x="40" y="96" width="20" height="30" rx="4" fill="#3a3f55" ${SW}/><rect x="43" y="100" width="14" height="20" rx="2" fill="#9fc3e6"/>`,
+  paper: (x, y) => `<g transform="translate(${x - 12} ${y - 30}) rotate(-6)"><rect width="24" height="30" rx="2" fill="#fff" ${SW}/><path d="M5 9 h14 M5 15 h14 M5 21 h9" stroke="#b9ab98" stroke-width="1.6"/></g>`,
+  notebook: () => `<g transform="translate(36 100) rotate(-4)"><rect width="30" height="24" rx="3" fill="#f6d38a" ${SW}/><path d="M15 2 v20" stroke="${INK}" stroke-width="1.6"/></g>`,
+  pen: (x, y) => `<path d="M${x} ${y} l10 -14" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+  suitcase: () => `<g transform="translate(88 112)"><rect x="0" y="8" width="34" height="42" rx="5" fill="#b4614a" ${SW}/><path d="M11 8 v-8 h12 v8" fill="none" ${SW}/><path d="M0 22 h34" stroke="${INK}" stroke-width="1.6"/></g>`,
+  tray: (x, y) => `<g transform="translate(${x - 22} ${y - 14})"><rect x="0" y="12" width="44" height="5" rx="2" fill="#c9c2b6" ${SW}/><path d="M6 12 q6 -14 14 0 M22 12 q8 -14 16 0" fill="#e8b66a" ${SW}/></g>`
+};
+
+// Soft "3D" characters: gradient-shaded faces, big round heads, glossy eyes and hair, no heavy outlines.
+let PID = 0;
+const shade = (hex, a) => { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = n >> 8 & 255, b = n & 255; const t = a < 0 ? 0 : 255, p = Math.abs(a); r = Math.round(r + (t - r) * p); g = Math.round(g + (t - g) * p); b = Math.round(b + (t - b) * p); return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1); };
+function person(c, o = {}) {
+  const mood = o.mood || 'neutral', pose = o.pose || 'down', sk = c.skin, hr = c.hair, sh = c.shirt, id = 'p' + (++PID);
+  const S = `url(#${id}s)`, HR = `url(#${id}h)`, B = `url(#${id}b)`, soft = 'stroke="rgba(40,25,15,.16)" stroke-width="1"';
+  let g = `<defs><radialGradient id="${id}s" cx="40%" cy="30%" r="78%"><stop offset="0" stop-color="${shade(sk, .3)}"/><stop offset=".55" stop-color="${sk}"/><stop offset="1" stop-color="${shade(sk, -.24)}"/></radialGradient>`
+    + `<linearGradient id="${id}h" x1=".2" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="${shade(hr, .32)}"/><stop offset="1" stop-color="${shade(hr, -.3)}"/></linearGradient>`
+    + `<linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${shade(sh, .24)}"/><stop offset="1" stop-color="${shade(sh, -.22)}"/></linearGradient></defs>`;
+  // hair behind the head (head parts sit 6 units lower, close to the shoulders)
+  g += '<g transform="translate(0 6)">';
+  if (c.style === 'long') g += `<path d="M21 40 Q21 6 50 6 Q79 6 79 40 L82 86 Q73 94 65 86 L65 52 L35 52 L35 86 Q27 94 18 86 Z" fill="${HR}"/>`;
+  if (c.style === 'bun') g += `<circle cx="50" cy="8" r="10.5" fill="${HR}"/>`;
+  if (c.style === 'pony') g += `<path d="M72 24 Q98 34 88 76 Q79 60 70 44 Z" fill="${HR}"/>`;
+  g += '</g>';
+  // neck and body
+  g += `<path d="M43 58 h14 v28 h-14z" fill="${shade(sk, -.14)}"/><ellipse cx="50" cy="64" rx="9" ry="4" fill="${shade(sk, -.3)}" opacity=".45"/>`;
+  g += `<path d="M19 168 C19 108 30 84 50 84 C70 84 81 108 81 168 Z" fill="${B}" ${soft}/>`;
+  if (c.outfit === 'suit') g += `<path d="M44 85 L50 98 L56 85 Z" fill="#f7f5f2"/><path d="M50 98 l-4 6 4 26 4 -26z" fill="#a8423b"/><path d="M38 86 L48 112 M62 86 L52 112" fill="none" stroke="${shade(sh, -.4)}" stroke-width="1.6"/>`;
+  else if (c.outfit === 'apron') g += `<path d="M34 106 h32 v64 h-32 z" fill="#fbfaf7" ${soft}/><path d="M34 106 L42 86 M66 106 L58 86" stroke="#e9e5de" stroke-width="2.4"/>`;
+  else g += `<path d="M42 85 L50 95 L58 85" fill="none" stroke="${shade(sh, -.35)}" stroke-width="1.8" stroke-linecap="round"/>`;
+  if (c.badge) g += `<rect x="58" y="102" width="14" height="8" rx="2" fill="#fff" ${soft}/>`;
+  // head
+  g += '<g transform="translate(0 6)">';
+  g += `<ellipse cx="24.5" cy="43" rx="4.5" ry="6.5" fill="${shade(sk, -.08)}"/><ellipse cx="75.5" cy="43" rx="4.5" ry="6.5" fill="${shade(sk, -.08)}"/>`;
+  g += `<ellipse cx="50" cy="38" rx="25.5" ry="27.5" fill="${S}"/>`;
+  if (c.beard) g += `<path d="M25 42 Q27 71 50 71 Q73 71 75 42 Q68 59 50 59 Q32 59 25 42Z" fill="${HR}"/>`;
+  const gloss = `<path d="M35 17 Q45 12 57 14" fill="none" stroke="#fff" stroke-opacity=".32" stroke-width="3" stroke-linecap="round"/>`;
+  if (c.style === 'curly') { for (let a = 188; a <= 352; a += 20) { const r = a * Math.PI / 180; g += `<circle cx="${(50 + 24 * Math.cos(r)).toFixed(1)}" cy="${(35 + 24 * Math.sin(r)).toFixed(1)}" r="10" fill="${HR}"/>`; } g += `<path d="M28 30 Q50 14 72 30 Q50 23 28 30Z" fill="${HR}"/>` + gloss; }
+  else if (c.style === 'side') g += `<path d="M24 42 Q21 8 53 8 Q80 11 76 36 Q62 18 40 27 Q30 32 24 42Z" fill="${HR}"/>` + gloss;
+  else if (c.style === 'bald') g += `<path d="M27 36 Q28 22 34 19 M73 36 Q72 22 66 19" fill="none" stroke="${HR}" stroke-width="5" stroke-linecap="round"/><path d="M40 16 Q50 12 60 15" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>`;
+  else if (c.style === 'mohawk') g += `<path d="M25 40 Q24 14 50 12 Q76 14 75 40 Q70 24 50 22 Q30 24 25 40Z" fill="${hr}" opacity=".28"/><path d="M41 21 L35 0 L45 10 L47 -10 L52 8 L57 -9 L59 10 L68 -1 L61 21 Q50 15 41 21Z" fill="${HR}"/><path d="M47 -6 L49 8 M57 -5 L56 8" stroke="#fff" stroke-opacity=".3" stroke-width="1.6"/>`;
+  else g += `<path d="M24 41 Q21 8 50 8 Q79 8 76 41 Q70 21 50 21 Q30 21 24 41Z" fill="${HR}"/>` + gloss;
+  // eyes
+  const m = mood, iris = c.eyes || '#4a3426', dx = m === 'thinking' ? 1.6 : 0, dy = m === 'thinking' ? -1.2 : (m === 'sad' || m === 'worried' || m === 'tired') ? 1 : 0;
+  const eye = x => (m === 'happy' || m === 'laugh')
+    ? `<path d="M${x - 4.8} 42 q4.8 -5.5 9.6 0" fill="none" stroke="#3a2a20" stroke-width="2.4" stroke-linecap="round"/>`
+    : `<ellipse cx="${x}" cy="40" rx="${m === 'surprised' ? 5 : 4.4}" ry="${m === 'surprised' ? 6.2 : 5.3}" fill="#fff"/><circle cx="${x + .4 + dx}" cy="${40.8 + dy}" r="${m === 'surprised' ? 2.6 : 3.2}" fill="${iris}"/><circle cx="${x + .4 + dx}" cy="${40.8 + dy}" r="1.5" fill="#120c08"/><circle cx="${x + 1.7 + dx}" cy="${39.1 + dy}" r="1.1" fill="#fff"/>`
+      + (m === 'tired' ? `<path d="M${x - 4.8} 40.5 a4.8 5.6 0 0 1 9.6 0 z" fill="${shade(sk, -.06)}"/>` : '');
+  g += eye(41) + eye(59);
+  const BR = { angry: 'M35 30 L46 35 M65 30 L54 35', sad: 'M35 34 L46 30 M65 34 L54 30', worried: 'M35 34 L46 30 M65 34 L54 30', tired: 'M36 33 q5 -1.5 10 0 M54 33 q5 -1.5 10 0', surprised: 'M36 28 q5 -4.5 10 0 M54 28 q5 -4.5 10 0', thinking: 'M36 32 L46 32 M54 30 L64 26' };
+  g += `<path d="${BR[m] || 'M36 32 q5 -3 10 0 M54 32 q5 -3 10 0'}" fill="none" stroke="${shade(hr, -.1)}" stroke-width="2.8" stroke-linecap="round"/>`;
+  g += `<path d="M47.5 47.5 q2.5 2.8 5 0" fill="none" stroke="${shade(sk, -.38)}" stroke-width="1.7" stroke-linecap="round"/>`;
+  g += `<ellipse cx="34.5" cy="50" rx="5.2" ry="3.2" fill="#ff8b78" opacity="${m === 'happy' || m === 'laugh' || m === 'smile' ? .42 : .2}"/><ellipse cx="65.5" cy="50" rx="5.2" ry="3.2" fill="#ff8b78" opacity="${m === 'happy' || m === 'laugh' || m === 'smile' ? .42 : .2}"/>`;
+  const lip = '#7c3a2e';
+  const MO = { smile: 'M43 53.5 q7 6.5 14 0', neutral: 'M45 55.5 h10', sad: 'M43 58 q7 -5.5 14 0', worried: 'M42 57 q4 -3 8 0 q4 3 8 0', angry: 'M43 58 q7 -4.5 14 0', thinking: 'M45 56 q5 2 9 -2', tired: 'M45 56.5 q5 -1.6 10 0' };
+  if (m === 'happy' || m === 'laugh') { const d = m === 'laugh' ? 67 : 63; g += `<path d="M41.5 52.5 Q50 ${d} 58.5 52.5 Z" fill="#6a2620"/><path d="M42.6 53 Q50 55.6 57.4 53 L56.8 54.8 Q50 57 43.2 54.8Z" fill="#fff"/>` + (m === 'laugh' ? `<ellipse cx="50" cy="61" rx="4.5" ry="2.4" fill="#e0716a"/>` : ''); }
+  else if (m === 'surprised') g += `<ellipse cx="50" cy="57" rx="3.8" ry="4.8" fill="#6a2620"/>`;
+  else g += `<path d="${MO[m] || MO.neutral}" fill="none" stroke="${lip}" stroke-width="2.5" stroke-linecap="round"/>`;
+  if (m === 'worried') g += `<path d="M78 22 q4 7 0 10 q-4 -3 0 -10z" fill="#8fd0f2"/>`;
+  if (m === 'angry') g += `<path d="M78 14 l6 -6 M82 20 l8 -2 M72 10 l2 -8" stroke="#d9573f" stroke-width="2.6" stroke-linecap="round"/>`;
+  if (c.glasses) g += `<circle cx="41" cy="40.5" r="7.6" fill="rgba(255,255,255,.14)" stroke="#2f2925" stroke-width="1.9"/><circle cx="59" cy="40.5" r="7.6" fill="rgba(255,255,255,.14)" stroke="#2f2925" stroke-width="1.9"/><path d="M48.6 40 h2.8" stroke="#2f2925" stroke-width="1.9"/>`;
+  if (c.shades) g += `<g transform="translate(50 40) scale(1.16) translate(-50 -41)"><path d="M27 37 Q50 30 73 37 L71 45 Q62 51 52 46 Q50 44 48 46 Q38 51 29 45 Z" fill="#d6ff2e"/><path d="M31 39 Q50 33 69 39 L67 44 Q61 48 53 44 Q50 42 47 44 Q39 48 33 44 Z" fill="#6a5cff"/><path d="M33 40 q8 -4 15 -3" stroke="#d8f6ff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".9"/><path d="M27 38 L21 40 M73 38 L79 40" stroke="#c5ef1c" stroke-width="3" stroke-linecap="round"/></g>`;
+  g += '</g>';
+  // props behind hands
+  if (pose === 'phone' || o.prop === 'phone') g += PROPS.phone();
+  if (o.prop === 'notebook') g += PROPS.notebook();
+  if (o.prop === 'suitcase') g += PROPS.suitcase();
+  const arms = ARMS[pose] || ARMS.down;
+  arms.forEach(([d, hx, hy]) => { g += `<path d="${d}" fill="none" stroke="${shade(sh, -.28)}" stroke-width="11" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${sh}" stroke-width="8" stroke-linecap="round"/><circle cx="${hx}" cy="${hy}" r="6.2" fill="${S}"/>`; });
+  const hand = arms[1];
+  if (o.prop === 'cup') g += PROPS.cup(hand[1], hand[2]);
+  if (o.prop === 'paper') g += PROPS.paper(hand[1], hand[2]);
+  if (o.prop === 'pen') g += PROPS.pen(hand[1], hand[2]);
+  if (o.prop === 'tray') g += PROPS.tray(hand[1], hand[2] - 6);
+  return g;
+}
+
+function placed(ch, sc = {}) {
+  const c = CAST[ch.c], s = (ch.s || 1) * (sc.sc || 1), x = ch.x, y = 260 - 168 * s - (sc.lift || 0) + (ch.dy || 0);
+  const t = ch.flip ? `translate(${x + 50 * s} ${y}) scale(${-s} ${s})` : `translate(${x - 50 * s} ${y}) scale(${s})`;
+  return `<g transform="${t}">${person(c, ch)}</g>`;
+}
+
+// ---------- scenes ----------
+const SC = {
+  desk: { sc: .86, lift: 26, bg: '#f7e8d0', back: () => `<rect x="268" y="28" width="96" height="62" rx="6" fill="#e9d3b2" ${SW}/>` + [0, 1, 2, 3].map(i => `<circle cx="${284 + i * 22}" cy="48" r="3" fill="${INK}"/><path d="M${284 + i * 22} 51 v14" stroke="#c9a06a" stroke-width="3"/>`).join(''), front: () => `<rect x="-4" y="222" width="408" height="50" fill="#d7a466" ${SW}/><rect x="-4" y="214" width="408" height="12" fill="#ecc38e" ${SW}/><g transform="translate(352 198)"><path d="M0 16 q12 -22 24 0z" fill="#e6c75a" ${SW}/><rect x="-3" y="15" width="30" height="4" rx="2" fill="#c9a640" ${SW}/><circle cx="12" cy="-2" r="2.5" fill="${INK}"/></g>` },
+  office: { bg: '#e6eef5', back: () => `<rect x="262" y="26" width="112" height="86" rx="6" fill="#cfe4f5" ${SW}/><path d="M318 26 v86 M262 69 h112" ${SW}/><path d="M0 232 H400" stroke="#c8d3dd" stroke-width="2"/>`, front: () => `<g transform="translate(14 176)"><rect x="6" y="40" width="34" height="44" rx="4" fill="#c98b5a" ${SW}/><path d="M23 40 q-24 -30 -6 -46 q2 24 6 46 q4 -30 22 -40 q4 22 -22 40" fill="#7fae7a" ${SW}/></g>` },
+  meeting: { sc: .95, bg: '#eee8f6', back: () => '', front: () => `<rect x="-4" y="234" width="408" height="40" fill="#c9b4a0" ${SW}/>` },
+  room: { bg: '#f3ece2', back: () => `<rect x="20" y="40" width="70" height="200" rx="4" fill="#e3cfae" ${SW}/><circle cx="78" cy="140" r="4" fill="${INK}"/><rect x="34" y="56" width="42" height="18" rx="3" fill="#fff" ${SW}/>` + `<rect x="250" y="150" width="160" height="70" rx="8" fill="#fff" ${SW}/><rect x="262" y="132" width="54" height="26" rx="10" fill="#f1f4f8" ${SW}/><rect x="250" y="192" width="160" height="40" fill="#9fc0dc" ${SW}/>`, front: () => '' },
+  cafe: { sc: .86, lift: 26, bg: '#f6e4d3', back: () => '', front: () => `<rect x="-4" y="224" width="408" height="48" fill="#b98d68" ${SW}/><rect x="-4" y="216" width="408" height="10" fill="#cfa47e" ${SW}/>` },
+  corridor: { bg: '#ece6dc', back: () => `<path d="M0 40 L140 90 L260 90 L400 40" fill="none" stroke="#cdbfa8" stroke-width="2"/><path d="M0 240 L140 190 L260 190 L400 240" fill="none" stroke="#cdbfa8" stroke-width="2"/><rect x="40" y="70" width="44" height="150" rx="3" fill="#e2cda9" ${SW}/><rect x="316" y="70" width="44" height="150" rx="3" fill="#e2cda9" ${SW}/><rect x="186" y="96" width="28" height="90" rx="2" fill="#e8d7bb" ${SW}/>`, front: () => '' },
+  night: { sc: .86, lift: 26, bg: '#323a58', back: () => `<rect x="262" y="26" width="112" height="86" rx="6" fill="#1f2540" ${SW}/><circle cx="342" cy="52" r="12" fill="#f3e7b5"/><circle cx="347" cy="48" r="11" fill="#1f2540"/><circle cx="290" cy="44" r="1.6" fill="#fff"/><circle cx="310" cy="80" r="1.4" fill="#fff"/>`, front: () => `<rect x="-4" y="222" width="408" height="50" fill="#6b5a4a" ${SW}/><rect x="-4" y="214" width="408" height="12" fill="#86705b" ${SW}/><g transform="translate(60 150)"><path d="M0 64 h28 M14 64 v-30 M14 34 l-18 -24 h36z" fill="#f3d98a" ${SW}/></g><ellipse cx="74" cy="210" rx="60" ry="14" fill="#f3d98a" opacity=".2"/>` },
+  outside: { bg: '#dcebf3', back: () => `<circle cx="340" cy="44" r="18" fill="#f6dc8c"/><rect x="0" y="206" width="400" height="60" fill="#cfe2c0"/><path d="M0 206 H400" ${SW}/><g transform="translate(24 96)"><rect x="18" y="60" width="12" height="52" fill="#a7774f" ${SW}/><circle cx="24" cy="44" r="32" fill="#93bf86" ${SW}/></g>`, front: () => '' },
+  home: { sc: .95, bg: '#efe3ee', back: () => `<rect x="24" y="30" width="80" height="60" rx="4" fill="#fff8ec" ${SW}/><path d="M34 76 l14 -18 10 12 8 -8 14 14" fill="none" stroke="#c48ab0" stroke-width="2"/><path d="M0 232 H400" stroke="#d8c8d6" stroke-width="2"/>`, front: () => `<rect x="-4" y="226" width="408" height="46" fill="#b5a0c8" ${SW}/><rect x="-4" y="218" width="408" height="14" rx="6" fill="#c9b6da" ${SW}/>` },
+  board: { bg: '#e9e3ef', back: () => `<rect x="12" y="10" width="376" height="212" rx="10" fill="#fff" ${SW}/><rect x="130" y="222" width="140" height="9" rx="3" fill="#cfc6b8" ${SW}/><rect x="150" y="216" width="26" height="6" rx="2" fill="#2f7f76"/><rect x="184" y="216" width="26" height="6" rx="2" fill="#c8553d"/>`, front: () => '' },
+  plain: { bg: '#f4ede1', back: () => '', front: () => '' }
+};
+
+// ---------- extras ----------
+const E = {
+  board: (x, y, w, h, inner) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#fff" ${SW}/><g transform="translate(${x} ${y})">${inner}</g>`,
+  text: (x, y, t, o = {}) => `<text x="${x}" y="${y}" font-family="Patrick Hand, Figtree, sans-serif" font-size="${o.s || 14}" fill="${o.c || INK}" text-anchor="${o.a || 'start'}"${o.w ? ` font-weight="${o.w}"` : ''}>${esc(tr(t))}</text>`,
+  clock: (x, y, t) => `<g transform="translate(${x} ${y})"><circle r="17" fill="#fff" ${SW}/><path d="M0 0 v-10 M0 0 l7 4" ${SW}/>${t ? `<text y="34" text-anchor="middle" font-family="Patrick Hand, sans-serif" font-size="14" fill="${INK}">${esc(t)}</text>` : ''}</g>`,
+  alarm: (x, y) => `<g transform="translate(${x} ${y})"><path d="M-14 8 q0 -24 14 -24 q14 0 14 24 z" fill="#e0533d" ${SW}/><rect x="-18" y="8" width="36" height="6" rx="3" fill="#b9402f" ${SW}/><path d="M-26 -16 l-8 -6 M26 -16 l8 -6 M-30 0 h-10 M30 0 h10" stroke="#e0533d" stroke-width="3" stroke-linecap="round"/></g>`,
+  hose: (x, y) => `<g transform="translate(${x} ${y})"><path d="M-14 10 q0 -22 14 -22 q14 0 14 22 z" fill="#4f8fc0" ${SW}/><rect x="-18" y="8" width="36" height="6" rx="3" fill="#3c7099" ${SW}/><path d="M18 -6 q14 -6 26 6" fill="none" stroke="#9fd0ee" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 5"/></g>`,
+  confetti: (x, y) => [[0, 0, '#e0533d'], [30, -10, '#4f8fc0'], [60, 6, '#e6c75a'], [-24, 14, '#7fae7a'], [90, -4, '#b37cc9'], [16, 30, '#e6c75a'], [70, 34, '#e0533d']].map(([dx, dy, c]) => `<rect x="${x + dx}" y="${y + dy}" width="8" height="4" rx="1" fill="${c}" transform="rotate(${(dx * 7) % 60} ${x + dx} ${y + dy})"/>`).join(''),
+  sparkle: (x, y, s = 1) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -10 L3 -3 L10 0 L3 3 L0 10 L-3 3 L-10 0 L-3 -3Z" fill="#f2c84b" ${SW}/>`,
+  heart: (x, y, s = 1) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 6 C-12 -4 -8 -14 0 -8 C8 -14 12 -4 0 6Z" fill="#e66f6a" ${SW}/>`,
+  bang: (x, y) => `<g transform="translate(${x} ${y})"><path d="M0 -14 v14" stroke="#e0533d" stroke-width="4" stroke-linecap="round"/><circle cy="8" r="2.6" fill="#e0533d"/></g>`,
+  q: (x, y) => E.text(x, y, '?', { s: 30, c: '#7d62a8' }),
+  zz: (x, y) => E.text(x, y, 'z z', { s: 20, c: '#9aa3c0' }),
+  coin: (x, y) => `<g transform="translate(${x} ${y})"><circle r="11" fill="#f2c84b" ${SW}/><text y="5" text-anchor="middle" font-family="Figtree" font-size="13" fill="${INK}">€</text></g>`,
+  croissants: (x, y) => `<g transform="translate(${x} ${y})"><rect x="-40" y="10" width="80" height="6" rx="3" fill="#fff" ${SW}/>` + [-24, 0, 24].map(d => `<path d="M${d - 12} 10 q12 -20 24 0" fill="#e8b66a" ${SW}/>`).join('') + '</g>',
+  cups: (x, y) => [0, 40].map(d => `<g transform="translate(${x + d} ${y})"><path d="M14 4 q8 0 8 7 q0 7 -8 7" fill="none" ${SW}/><rect width="15" height="19" rx="3" fill="#fff" ${SW}/></g>`).join(''),
+  guests: (x, y, n = 4) => Array.from({ length: n }, (_, i) => `<g transform="translate(${x + i * 34} ${y + (i % 2) * 6})"><circle r="13" fill="${['#e7c3a0', '#c99b7a', '#f0d2b8', '#a8795a'][i % 4]}" ${SW}/><path d="M-18 46 q0 -30 18 -30 q18 0 18 30z" fill="${['#8fa9c9', '#c98f8f', '#9fc49a', '#d0b37a'][i % 4]}" ${SW}/></g>`).join(''),
+  screen: (x, y, w, h, inner) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#3a3f55" ${SW}/><rect x="${x + 6}" y="${y + 6}" width="${w - 12}" height="${h - 12}" rx="4" fill="#f7f9fc"/><g transform="translate(${x + 6} ${y + 6})">${inner}</g>`,
+  check: (x, y, on = true) => `<rect x="${x}" y="${y}" width="12" height="12" rx="2" fill="#fff" ${SW}/>` + (on ? `<path d="M${x + 2} ${y + 6} l3 3 l6 -7" fill="none" stroke="#3f8a80" stroke-width="2.4" stroke-linecap="round"/>` : '')
+};
+
+// ---------- rendering ----------
+let BK = 0; // running bubble number inside a scene
+function bubble(b) {
+  const x = b.x, y = b.y, w = b.w || 170, h = 260 - y, tx = Math.max(18, Math.min(w - 18, (b.tail != null ? b.tail : x + w / 2) - x));
+  const cls = 'bub' + (b.think ? ' think' : '') + (b.shout ? ' shout' : '');
+  return `<foreignObject x="${x}" y="${y}" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" class="${cls}" data-k="${++BK}" style="--tx:${tx}px">${tr(b.t)}</div></foreignObject>`;
+}
+function panel(p) {
+  const sc = SC[p.scene || 'plain'];
+  const bg = p.bgc || sc.bg;
+  const chars = (p.chars || []).filter(ch => !ch.fore).map(ch => placed(ch, sc)).join('');
+  const fore = (p.chars || []).filter(ch => ch.fore).map(ch => placed(ch, {})).join('');
+  const label = p.label ? `<foreignObject x="10" y="10" width="220" height="40"><div xmlns="http://www.w3.org/1999/xhtml" class="plab">${tr(p.label)}</div></foreignObject>` : '';
+  const svg = `<svg viewBox="0 0 400 260" role="img" aria-label="${esc((p.bubbles || []).map(b => tr(b.t).replace(/<[^>]+>/g, '')).join(' · '))}"><rect width="400" height="260" fill="${bg}"/>${sc.back()}${p.zoom ? `<g transform="translate(22 22) scale(1.48)">${tr(p.zoom)}</g>` : ''}${tr(p.behind) || ''}${chars}${sc.front()}${fore}${tr(p.extras) || ''}${(p.bubbles || []).map(bubble).join('')}${label}</svg>`;
+  return `<figure class="panel">${svg}</figure>`;
+}
+
+// the narrator who tells the captions
+const NARR = { skin: '#c99a72', hair: '#1d1612', style: 'mohawk', shades: true, shirt: '#2f3a4a' };
+// ---------- story stage ----------
+const UI = {
+  it: { principle: 'Il principio', mod: 'Modulo', chap: 'Capitolo', prev: 'Indietro', next: 'Avanti', dur: 'Durata', min: 'min',
+    keys: 'Usa le <b>frecce della tastiera</b> per vedere la storia!', touch: 'Tocca <b>›</b> o scorri con il dito per vedere la storia!', nudgeK: 'Usa <b>→</b> per andare avanti e <b>←</b> per tornare indietro', nudgeT: 'Tocca <b>›</b> per andare avanti e <b>‹</b> per tornare indietro',
+    more: 'Vuoi saperne di più?', open: 'Apri il riassunto interattivo', again: '↺ Ricomincia' },
+  en: { principle: 'The principle', mod: 'Module', chap: 'Chapter', prev: 'Back', next: 'Next', dur: 'Duration', min: 'min',
+    keys: 'Use your <b>keyboard arrows</b> to view the story!', touch: 'Tap <b>›</b> or swipe to view the story!', nudgeK: 'Use <b>→</b> to go forward and <b>←</b> to go back', nudgeT: 'Tap <b>›</b> to go forward and <b>‹</b> to go back',
+    more: 'Want to know more?', open: 'Open the interactive summary', again: '↺ Start again' }
+};
+const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const KEYS = `<svg class="kb" viewBox="0 0 132 86" aria-hidden="true"><rect x="1" y="1" width="130" height="84" rx="12" fill="rgba(255,255,255,.08)"/>
+  ${[[47, 8, '▲'], [8, 46, '◀'], [47, 46, '▼']].map(([x, y, t]) => `<rect${t === '◀' ? ' class="kl"' : ''} x="${x}" y="${y}" width="36" height="32" rx="6" fill="#f2f0ec" stroke="#b9b3a8"/><text x="${x + 18}" y="${y + 21}" text-anchor="middle" font-size="11" fill="#8d877c">${t}</text>`).join('')}
+  <rect class="kr" x="86" y="46" width="36" height="32" rx="6" fill="#7ee08a" stroke="#3f9a4c"/><text x="104" y="67" text-anchor="middle" font-size="11" fill="#1f5a2a">▶</text></svg>`;
+let STEPS = [], CUR = 0, SHOWN = -1;
+function screens() {
+  const S = STORY, u = UI[LANG], out = [];
+  STEPS = [];
+  // intro
+  const hero = CAST[S.hero];
+  out.push(`<section class="scr intro" data-s="0"><div class="host big"><svg class="herofig" viewBox="-4 -12 108 108" aria-hidden="true">${person(NARR, { mood: 'happy', pose: 'wave' })}</svg><p class="hello">${tr(S.hello)}</p></div></section>`);
+  STEPS.push({ s: 0, k: 0 });
+  let si = 1;
+  S.chapters.forEach((c, ci) => c.beats.forEach((b, bi) => {
+    BK = 0;
+    const panels = b.panels || [b.panel];
+    const ph = panels.map(panel).join(''), nb = BK;
+    const glow = (panels[0].bgc || SC[panels[0].scene || 'plain'].bg);
+    const ins = b.note ? `<div class="dim"></div><aside class="ins"><p class="ik">${BULB}<span>${u.principle}</span>${b.note.mod ? `<em>${u.mod} ${b.note.mod}</em>` : ''}</p><h3>${tr(b.note.t)}</h3><p>${tr(b.note.p)}</p></aside>` : '';
+    out.push(`<section class="scr beat" data-s="${si}" style="--glow:${glow}"><p class="chip"><span>${u.chap} ${ci + 1}</span>${tr(c.t)}</p>
+      <div class="box n${panels.length}">${ph}${b.cap ? `<div class="narr-c"><svg class="av" viewBox="8 -6 84 84" aria-hidden="true">${person(NARR, { mood: 'smile' })}</svg><p class="nb">${tr(b.cap)}</p></div>` : ''}</div>${ins}</section>`);
+    // the narrator introduces the scene first, alone and centred; then the scene plays
+    if (b.cap) STEPS.push({ s: si, k: 0, narr: true });
+    if (nb === 0) STEPS.push({ s: si, k: 0 });
+    for (let k = 1; k <= nb; k++) STEPS.push({ s: si, k });
+    if (b.note) STEPS.push({ s: si, k: nb, ins: true });
+    si++;
+  }));
+  const E2 = S.end;
+  out.push(`<section class="scr end" data-s="${si}"><div class="endc"><span class="tag">${BULB}${tr(S.tag)}</span><h2>${u.more}</h2><p>${tr(E2.p)}</p>
+    <a class="btn" href="${E2.link}${LANG === 'it' ? '#it' : ''}" target="_blank" rel="noopener">${u.open} ↗</a>
+    <button type="button" class="again" data-go="0">${u.again}</button><p class="fine">${tr(E2.fine)}</p></div></section>`);
+  STEPS.push({ s: si, k: 0 });
+  return out.join('');
+}
+function render() {
+  document.documentElement.lang = LANG;
+  document.title = tr(STORY.title);
+  const html = screens();
+  const mins = Math.max(2, Math.round(STEPS.length * 4.5 / 60));
+  document.getElementById('story').innerHTML = html.replace('<p class="dur"></p>', `<p class="dur"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>${UI[LANG].dur}: ${mins} ${UI[LANG].min}</p>`);
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
+  const u = UI[LANG]; document.getElementById('prev').setAttribute('aria-label', u.prev); document.getElementById('next').setAttribute('aria-label', u.next);
+  document.getElementById('hint').innerHTML = `<div class="keys">${KEYS}</div><p class="note-y" id="hintnote"></p>`;
+  CUR = Math.min(CUR, STEPS.length - 1); SHOWN = -1; apply();
+}
+const TOUCH = matchMedia('(hover: none) and (pointer: coarse)').matches;
+function hintText(nudging) { const u = UI[LANG]; document.getElementById('hintnote').innerHTML = nudging ? (TOUCH ? u.nudgeT : u.nudgeK) : (TOUCH ? u.touch : u.keys); }
+let nudgeT = 0;
+function nudge() {
+  const h = document.getElementById('hint'), n = document.querySelector('.nav');
+  hintText(true); h.classList.remove('nudge'); n.classList.remove('nudge'); void h.offsetWidth; h.classList.add('nudge'); n.classList.add('nudge');
+  clearTimeout(nudgeT); nudgeT = setTimeout(() => { h.classList.remove('nudge'); n.classList.remove('nudge'); if (CUR === 0) hintText(false); }, 2600);
+}
+function apply() {
+  const st = STEPS[CUR], all = document.querySelectorAll('.scr');
+  if (st.s !== SHOWN) { all.forEach(x => { const on = +x.dataset.s === st.s; x.classList.toggle('on', on); x.setAttribute('aria-hidden', String(!on)); }); SHOWN = st.s; }
+  const scr = all[st.s];
+  scr.querySelectorAll('.bub[data-k]').forEach(b => b.classList.toggle('in', +b.dataset.k <= st.k));
+  scr.classList.toggle('insight', !!st.ins);
+  scr.classList.toggle('narr-on', !!st.narr);
+  document.getElementById('prev').disabled = CUR === 0;
+  document.getElementById('next').disabled = CUR === STEPS.length - 1;
+  document.body.classList.toggle('at-start', CUR === 0);
+  if (!document.getElementById('hint').classList.contains('nudge')) hintText(false);
+  document.getElementById('prog').style.transform = `scaleX(${STEPS.length > 1 ? CUR / (STEPS.length - 1) : 0})`;
+}
+function go(i) { i = Math.max(0, Math.min(STEPS.length - 1, i)); if (i === CUR) return; CUR = i; apply(); }
+function init() {
+  const h = location.hash;
+  let lg = h === '#en' ? 'en' : h === '#it' ? 'it' : null;
+  if (!lg) { try { lg = localStorage.getItem('comic-lang'); } catch (e) {} }
+  LANG = lg === 'en' ? 'en' : 'it';
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
+    LANG = b.dataset.lang; try { localStorage.setItem('comic-lang', LANG); } catch (e) {}
+    try { history.replaceState(null, '', '#' + LANG); } catch (e) {}
+    render();
+  }));
+  document.getElementById('prev').addEventListener('click', () => go(CUR - 1));
+  document.getElementById('next').addEventListener('click', () => go(CUR + 1));
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (g) { go(+g.dataset.go); return; }
+    if (!TOUCH && !e.target.closest('button, a, .lang')) nudge();
+  });
+  const QUIET = ['Tab', 'Shift', 'Alt', 'Control', 'Meta', 'CapsLock', 'Escape', 'Enter'];
+  addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(CUR + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(CUR - 1); }
+    else if (!QUIET.includes(e.key)) { e.preventDefault(); nudge(); }
+  });
+  let wheelT = 0;
+  addEventListener('wheel', () => { const t = Date.now(); if (t - wheelT > 900) { wheelT = t; nudge(); } }, { passive: true });
+  let sx = 0, sy = 0, t0 = 0, onBtn = false;
+  addEventListener('touchstart', e => { const t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); onBtn = !!e.target.closest('button, a, .lang'); }, { passive: true });
+  addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3 && Date.now() - t0 < 800) go(CUR + (dx < 0 ? 1 : -1));
+    else if (!onBtn) nudge();
+  }, { passive: true });
+  render();
+}
+
+const CAST = {
+  marta: { name: 'Marta', role: { it: 'Operations, Black Belt', en: 'Operations, Black Belt' }, skin: '#e9c09c', hair: '#2f2320', style: 'pony', shirt: '#5fa69b', badge: true },
+  dario: { name: 'Dario', role: { it: 'Receptionist', en: 'Receptionist' }, skin: '#f0cfae', hair: '#6b4a32', style: 'side', shirt: '#7fa3c7', glasses: true, badge: true },
+  ana: { name: 'Ana', role: { it: 'Responsabile pulizie', en: 'Head of housekeeping' }, skin: '#b5835f', hair: '#1f1713', style: 'bun', shirt: '#b8a0d6', outfit: 'apron' },
+  dir: { name: 'Bruno', role: { it: 'Direttore', en: 'General manager' }, skin: '#efc9a6', hair: '#8d8780', style: 'short', shirt: '#4c5566', outfit: 'suit' },
+  g1: { skin: '#d8a985', hair: '#6b4a32', style: 'side', shirt: '#c98f8f' },
+  g2: { skin: '#f2d2b6', hair: '#c4833f', style: 'long', shirt: '#9fc49a' },
+  g3: { skin: '#9c6b4e', hair: '#1f1713', style: 'short', shirt: '#8fa9c9', beard: true },
+  bianchi: { name: 'Sig. Bianchi', role: { it: 'Ospite', en: 'Guest' }, skin: '#e2b48e', hair: '#5a4636', style: 'bald', beard: true, shirt: '#c98f6a' }
+};
+const H = (it, en) => ({ it, en });
+const T = (x, y, t, o) => E.text(x, y, t, o);
+const ACC = '#2f7f76', RED = '#c8553d';
+
+// Boards: few numbers, one idea each, readable at a glance.
+const pareto = () => {
+  const d = [[H('Attese', 'Waits'), 38], [H('Rumore', 'Noise'), 24], [H('Wi-Fi', 'Wi-Fi'), 18], [H('Colazione', 'Breakfast'), 11], [H('Altro', 'Other'), 9]];
+  const bars = d.map(([l, v], i) => { const x = 16 + i * 43, h = v * 1.55; return `<rect x="${x}" y="${88 - h}" width="34" height="${h}" rx="3" fill="${i < 3 ? ACC : '#c3ddd8'}"/>` + T(x + 17, 101, l, { s: 11, a: 'middle' }); }).join('');
+  return `<path d="M16 22 v-5 H136 v5" fill="none" stroke="${INK}" stroke-width="1.6"/>` + T(76, 12, H('8 lamentele su 10', '8 complaints out of 10'), { s: 13, a: 'middle', c: ACC }) + bars + `<path d="M8 88 H230" stroke="${INK}" stroke-width="1.6"/>`;
+};
+const takt = () => T(12, 18, H('Tempo per ogni camera', 'Time for each room'), { s: 15 })
+  + T(12, 43, H('A disposizione', 'Available'), { s: 12.5 }) + `<rect x="100" y="30" width="118" height="20" rx="4" fill="${ACC}"/>` + T(212, 45, '28 min', { s: 13, a: 'end', c: '#fff' })
+  + T(12, 71, H('Necessario', 'Needed'), { s: 12.5 }) + `<rect x="100" y="58" width="134" height="20" rx="4" fill="${RED}"/>` + T(228, 73, '32 min', { s: 13, a: 'end', c: '#fff' })
+  + T(12, 99, H('6 persone · turno di 7 ore · 90 camere', '6 people · 7-hour shift · 90 rooms'), { s: 11, c: '#7a7064' });
+const whys = () => T(12, 17, H('Perché l\'ospite ha aspettato?', 'Why did the guest wait?'), { s: 14 }) + [H('1 · La camera non era pronta', '1 · The room wasn\'t ready'), H('2 · È stata preparata per ultima', '2 · It was prepared last'), H('3 · Nessuno sapeva dell\'arrivo anticipato', '3 · Nobody knew about the early arrival'), H('4 · L\'avviso era in un\'email', '4 · The notice was in an email'), H('5 · Manca un canale unico per le richieste', '5 · There\'s no single channel for requests')]
+  .map((t, i) => T(12, 36 + i * 15.5, t, { s: 12.2, c: i === 4 ? ACC : INK })).join('');
+const form = () => T(10, 18, H('Cambio turno', 'Shift handover'), { s: 14 }) + [H('Arrivi anticipati *', 'Early arrivals *'), H('Guasti *', 'Breakdowns *'), H('Richieste speciali *', 'Special requests *'), H('Ospiti da richiamare *', 'Guests to call back *')]
+  .map((t, i) => E.check(10, 28 + i * 19, i < 3) + T(28, 38 + i * 19, t, { s: 12.5 })).join('');
+const beforeAfter = () => T(12, 16, H('Attesa media per chi arriva in anticipo', 'Average wait for early arrivals'), { s: 12.5, c: '#7a7064' })
+  + T(12, 41, H('Prima', 'Before'), { s: 13 }) + `<rect x="64" y="28" width="164" height="20" rx="4" fill="#b9b2a6"/>` + T(222, 43, '41 min', { s: 13, a: 'end', c: '#fff' })
+  + T(12, 71, H('Dopo', 'After'), { s: 13 }) + `<rect x="64" y="58" width="48" height="20" rx="4" fill="${ACC}"/>` + T(106, 73, '12 min', { s: 13, a: 'end', c: '#fff' })
+  + T(12, 99, H('Una differenza troppo grande per essere un caso', 'A difference too large to be chance'), { s: 11.5, c: ACC });
+const ctrl = () => {
+  const v = [5, 7, 4, 6, 8, 5, 6, 4, 19, 6, 5, 7, 4, 6];
+  const pts = v.map((y, i) => `${14 + i * 15.5},${100 - y * 3.6}`);
+  return T(8, 12, H('Lamentele al giorno', 'Complaints per day'), { s: 11.5, c: '#7a7064' }) + `<path d="M8 ${100 - 13 * 3.6} H228 M8 ${100 - 0.6 * 3.6} H228" stroke="${RED}" stroke-width="1.4" stroke-dasharray="5 4"/><path d="M8 ${100 - 5.8 * 3.6} H228" stroke="#9aa" stroke-width="1"/>` +
+    `<polyline points="${pts.join(' ')}" fill="none" stroke="${ACC}" stroke-width="2"/>` + pts.map((p, i) => { const [x, y] = p.split(','); return `<circle cx="${x}" cy="${y}" r="${i === 8 ? 4.5 : 2.6}" fill="${i === 8 ? RED : ACC}"/>`; }).join('') +
+    T(14 + 8 * 15.5 + 8, 100 - 19 * 3.6 + 4, H('concerto', 'concert'), { s: 12, c: RED }) + T(226, 100 - 13 * 3.6 - 4, H('fuori dalla norma', 'out of the ordinary'), { s: 10.5, a: 'end', c: RED }) + T(226, 100 - 5.8 * 3.6 + 12, H('giorni normali', 'normal days'), { s: 10.5, a: 'end', c: '#7a7064' });
+};
+
+// Fixed blocking, the same in every scene:
+//   reception: Bianchi (and other guests) on the left in front of the desk, Dario on the right behind it
+//   Bruno's office: Bruno on the left, Marta on the right
+//   Marta with Ana: Marta on the left, Ana on the right
+//   cafe line-up, left to right: Bruno, Marta, Ana, Dario
+// Data is shown on a full-size board, explained by the narrator, then the characters react.
+const DESK_B = (mood, pose, extra = {}) => ({ c: 'bianchi', x: 110, mood, pose, prop: 'suitcase', fore: true, ...extra });
+const DESK_D = (mood, pose) => ({ c: 'dario', x: 295, mood, pose, flip: true });
+const OFF_BRUNO = (mood, pose) => ({ c: 'dir', x: 120, mood, pose });
+const OFF_MARTA = (mood, pose) => ({ c: 'marta', x: 285, mood, pose, flip: true });
+const PAIR_MARTA = (mood, pose, prop) => ({ c: 'marta', x: 120, mood, pose, prop });
+const PAIR_ANA = (mood, pose) => ({ c: 'ana', x: 285, mood, pose, flip: true });
+
+const STORY = {
+  hello: H('Ciao, mi chiamo Marvin! In questo fumetto ti racconto cosa ho imparato nel corso Lean Six Sigma Black Belt. Il concetto chiave è semplice: quando qualcosa non funziona, non si cerca un colpevole ma la causa, partendo dai dati e ascoltando chi fa il lavoro ogni giorno.', 'Hi, my name is Marvin! In this comic I\'ll tell you what I learned in the Lean Six Sigma Black Belt course. The key idea is simple: when something isn\'t working, you don\'t look for someone to blame but for the cause, starting from the data and listening to the people who do the work every day.'),
+  hero: 'marta',
+  title: H('Lean Six Sigma a fumetti', 'Lean Six Sigma, the comic'),
+  chapters: [
+    { t: H('Define: il problema, non il colpevole', 'Define: the problem, not the culprit'), beats: [
+      { cap: H('Sono le 15:20. Il signor Bianchi è arrivato alle 14:30 e la sua camera non è ancora pronta.', 'It\'s 3:20 pm. Mr Bianchi arrived at 2:30 and his room still isn\'t ready.'),
+        panel: { scene: 'desk', chars: [DESK_D('worried'), DESK_B('angry', 'hips')], extras: E.clock(206, 120, '15:20'),
+          bubbles: [{ x: 10, y: 10, w: 190, tail: 110, shout: true, t: H('Cinquanta minuti di attesa per una camera?!', 'Fifty minutes\' wait for a room?!') }, { x: 222, y: 24, w: 172, tail: 295, t: H('Mi scusi, la stiamo ultimando proprio adesso.', 'I\'m sorry, we\'re finishing it right now.') }] } },
+      { cap: H('Il giorno dopo, nell\'ufficio di Bruno, il direttore.', 'The next day, in the office of Bruno, the general manager.'),
+        panel: { scene: 'office', chars: [OFF_BRUNO('angry', 'point'), OFF_MARTA('thinking', 'think')],
+          bubbles: [{ x: 10, y: 10, w: 200, tail: 120, t: H('Le pulizie devono essere <b>più rapide</b>. È deciso.', 'Housekeeping has to be <b>quicker</b>. That\'s settled.') }, { x: 222, y: 30, w: 172, tail: 285, think: true, t: H('E se la rapidità non fosse il vero problema?', 'What if speed isn\'t the real problem?') }] },
+        note: { mod: 1, t: H('Il risultato dipende dalle cause', 'Results depend on causes'), p: H('L\'attesa dell\'ospite è il risultato; le cause stanno a monte. Chiedere di fare più in fretta agisce sul risultato, non sulle cause. Per migliorare davvero bisogna prima capire da cosa dipende. In Lean Six Sigma si scrive y = f(x).', 'The guest\'s wait is the result; the causes lie upstream. Asking people to hurry acts on the result, not on the causes. To really improve, you first need to understand what it depends on. In Lean Six Sigma this is written y = f(x).') } },
+      { panel: { scene: 'office', chars: [OFF_BRUNO('neutral', 'cross'), OFF_MARTA('smile', 'shrug')],
+          bubbles: [{ x: 196, y: 10, w: 198, tail: 285, t: H('Prima di intervenire, raccogliamo i dati. Mi concede due settimane?', 'Before we act, let\'s gather the data. Can you give me two weeks?') }, { x: 14, y: 40, w: 170, tail: 120, t: H('D\'accordo, due settimane.', 'All right, two weeks.') }] } }
+    ] },
+    { t: H('Measure: i dati prima delle opinioni', 'Measure: data before opinions'), beats: [
+      { cap: H('Marta raccoglie sei mesi di lamentele e le ordina dalla più frequente alla meno frequente.', 'Marta gathers six months of complaints and sorts them from most to least frequent.'),
+        panel: { scene: 'board', zoom: () => pareto() },
+        note: { mod: 3, t: H('Il principio di Pareto', 'The Pareto principle'), p: H('Poche cause generano la maggior parte dei problemi. Qui tre cause su cinque valgono otto lamentele su dieci, e la prima è l\'attesa della camera: è da lì che conviene partire.', 'A few causes create most of the problems. Here three causes out of five account for eight complaints in ten, and the first is the wait for the room: that\'s the place to start.') } },
+      { cap: H('Poi verifica una cosa semplice: quanto tempo c\'è, in media, per preparare ogni camera?', 'Then she checks something simple: how much time is there, on average, to prepare each room?'),
+        panel: { scene: 'board', zoom: () => takt() },
+        note: { mod: 4, t: H('Il ritmo della domanda (takt time)', 'The pace of demand (takt time)'), p: H('È il tempo disponibile diviso per il lavoro da fare. Se una camera richiede più tempo di quello a disposizione, il ritardo è inevitabile, per quanto le persone si impegnino.', 'It\'s the time available divided by the work to be done. If a room takes longer than the time available, delays are unavoidable, however hard people work.') } },
+      { cap: H('Marta condivide il risultato con Ana, la responsabile delle pulizie.', 'Marta shares the result with Ana, the head of housekeeping.'),
+        panel: { scene: 'corridor', chars: [PAIR_MARTA('smile', 'point'), PAIR_ANA('surprised')],
+          bubbles: [{ x: 10, y: 10, w: 200, tail: 120, t: H('In media avete 28 minuti a camera. Per farla bene ne servono 32.', 'On average you have 28 minutes per room. Doing it well takes 32.') }, { x: 222, y: 34, w: 172, tail: 285, t: H('Allora non siamo lente: è il tempo che non basta!', 'So we\'re not slow: there just isn\'t enough time!') }] } }
+    ] },
+    { t: H('Analyze: arrivare alla causa', 'Analyze: getting to the cause'), beats: [
+      { cap: H('Resta una domanda: perché proprio la camera del signor Bianchi è stata preparata per ultima? Marta chiede “perché?” cinque volte di fila.', 'One question remains: why was Mr Bianchi\'s room prepared last? Marta asks “why?” five times in a row.'),
+        panel: { scene: 'board', zoom: () => whys() },
+        note: { mod: 3, t: H('I 5 perché', 'The 5 whys'), p: H('La prima risposta è quasi sempre la più ovvia. Andando a fondo si passa da “pulite più in fretta” a “manca un canale unico per le richieste speciali”: una causa concreta, su cui si può agire.', 'The first answer is almost always the most obvious one. Digging deeper takes you from “clean faster” to “there\'s no single channel for special requests”: a concrete cause you can act on.') } },
+      { panel: { scene: 'corridor', chars: [PAIR_MARTA('thinking', 'think'), PAIR_ANA('surprised', 'shrug')],
+          bubbles: [{ x: 196, y: 8, w: 198, tail: 285, t: H('L\'arrivo anticipato era segnalato via email? Noi le email non le riceviamo!', 'The early arrival was flagged by email? We don\'t get those emails!') }, { x: 6, y: 14, w: 184, tail: 120, t: H('Quindi il problema è come girano le informazioni, non il vostro lavoro.', 'So the problem is how information flows, not your work.') }] } },
+      { cap: H('Poi Marta fa la domanda che nessuno aveva mai fatto.', 'Then Marta asks the question nobody had ever asked.'),
+        panel: { scene: 'corridor', chars: [PAIR_MARTA('smile', 'hold', 'paper'), PAIR_ANA('surprised')],
+          bubbles: [{ x: 14, y: 12, w: 176, tail: 120, t: H('Secondo te, cosa andrebbe cambiato?', 'In your view, what should change?') }, { x: 214, y: 14, w: 180, tail: 285, t: H('In dieci anni non me l\'aveva mai chiesto nessuno.', 'In ten years nobody had ever asked me.') }] } },
+      { panel: { scene: 'corridor', chars: [PAIR_MARTA('happy', 'write', 'notebook'), PAIR_ANA('laugh', 'point')], extras: E.sparkle(204, 130),
+          bubbles: [{ x: 160, y: 8, w: 234, tail: 285, t: H('Un\'unica lista degli arrivi anticipati. E i carrelli preparati la sera prima, non al mattino.', 'A single list of early arrivals. And carts prepared the night before, not in the morning.') }] },
+        note: { mod: 2, t: H('Le idee vanno chieste', 'Ideas have to be asked for'), p: H('Chi svolge il lavoro ogni giorno sa dove si inceppa, ma raramente lo dice di sua iniziativa. Non ascoltarlo è uno spreco, come il tempo perso. E preparare prima tutto ciò che si può fare prima è un principio del Lean (SMED).', 'The people who do the work every day know where it gets stuck, but rarely say so on their own. Not listening to them is a waste, just like lost time. And preparing in advance whatever can be done in advance is a Lean principle (SMED).') } }
+    ] },
+    { t: H('Improve: provare in piccolo', 'Improve: try it small first'), beats: [
+      { cap: H('Alla reception, Dario propone un modulo per il cambio turno.', 'At reception, Dario suggests a form for the shift handover.'),
+        panel: { scene: 'desk', behind: () => E.screen(18, 36, 188, 112, form()), chars: [DESK_D('smile', 'point')],
+          bubbles: [{ x: 220, y: 12, w: 174, tail: 295, t: H('Con i campi obbligatori, nessuna informazione va persa.', 'With required fields, no information gets lost.') }] },
+        note: { mod: 2, t: H('Errori resi impossibili (poka-yoke)', 'Mistakes made impossible (poka-yoke)'), p: H('Invece di contare sulla memoria delle persone, si progetta il processo in modo che l\'errore non possa capitare. È il modulo a chiedere ciò che serve: nessuno deve ricordarselo.', 'Instead of relying on people\'s memory, you design the process so the mistake can\'t happen. The form asks for what\'s needed: nobody has to remember it.') } },
+      { cap: H('Dopo un mese di prova, Marta confronta i tempi di attesa prima e dopo il cambiamento.', 'After a month\'s trial, Marta compares waiting times before and after the change.'),
+        panel: { scene: 'board', zoom: () => beforeAfter() },
+        note: { mod: 6, t: H('Miglioramento reale o fortuna?', 'Real improvement or luck?'), p: H('Ogni dato oscilla un po\' anche da solo. Un test statistico verifica se una differenza è abbastanza grande da non poter dipendere dal caso. Qui lo è: il miglioramento è reale. (Dati di esempio.)', 'Every figure moves a little on its own. A statistical test checks whether a difference is large enough that it can\'t be down to chance. Here it is: the improvement is real. (Example data.)') } },
+      { panel: { scene: 'office', chars: [OFF_BRUNO('surprised'), OFF_MARTA('smile', 'shrug')],
+          bubbles: [{ x: 10, y: 10, w: 196, tail: 120, t: H('Da 41 a 12 minuti. Non sarà solo fortuna?', 'From 41 to 12 minutes. Isn\'t it just luck?') }, { x: 214, y: 34, w: 180, tail: 285, t: H('No: la differenza è troppo ampia per essere casuale.', 'No: the difference is too large to be chance.') }] } }
+    ] },
+    { t: H('Control: mantenere il risultato', 'Control: keeping the result'), beats: [
+      { cap: H('Sabato c\'è un concerto in città e gli ospiti arrivano tutti insieme.', 'On Saturday there\'s a concert in town and the guests all arrive at once.'),
+        panel: { scene: 'desk', chars: [DESK_D('worried', 'shrug'), { c: 'g1', x: 62, s: .82, mood: 'angry', pose: 'hips', fore: true }, { c: 'g2', x: 136, s: .76, mood: 'worried', fore: true }, { c: 'g3', x: 204, s: .8, mood: 'neutral', pose: 'cross', fore: true }], extras: E.bang(250, 40) + E.bang(266, 52),
+          bubbles: [{ x: 10, y: 10, w: 190, tail: 62, shout: true, t: H('Ero qui prima io!', 'I was here first!') }, { x: 236, y: 40, w: 158, tail: 295, t: H('Che giornata…', 'What a day…') }] } },
+      { cap: H('Lunedì Bruno è tentato di rimettere tutto in discussione. Marta gli mostra l\'andamento delle lamentele, giorno per giorno.', 'On Monday Bruno is tempted to question everything again. Marta shows him how complaints have gone, day by day.'),
+        panel: { scene: 'board', zoom: () => ctrl() } },
+      { panel: { scene: 'office', chars: [OFF_BRUNO('thinking', 'think'), OFF_MARTA('smile', 'point')],
+          bubbles: [{ x: 10, y: 10, w: 190, tail: 120, t: H('Allora il nuovo metodo regge?', 'So the new method holds up?') }, { x: 206, y: 30, w: 188, tail: 285, t: H('Sì. Sabato è stato un caso eccezionale, non un difetto del processo.', 'Yes. Saturday was an exception, not a flaw in the process.') }] },
+        note: { mod: 6, t: H('Normale o eccezionale?', 'Normal or exceptional?'), p: H('Ogni processo ha piccole oscillazioni normali. Un picco isolato, come la sera del concerto, è un evento eccezionale: va capito, non usato per cambiare ciò che funziona. Vale anche per la giornata storta di un collega.', 'Every process has small, normal ups and downs. An isolated spike, like the concert night, is an exceptional event: it should be understood, not used to change what works. The same goes for a colleague\'s bad day.') } },
+      { cap: H('C\'è un\'ultima tappa che spesso si dimentica: riconoscere il lavoro del team.', 'There\'s one last step that often gets forgotten: recognising the team\'s work.'),
+        panel: { scene: 'cafe', chars: [{ c: 'dir', x: 60, mood: 'smile' }, { c: 'marta', x: 155, mood: 'smile', pose: 'hold', prop: 'cup' }, { c: 'ana', x: 250, mood: 'laugh', flip: true }, { c: 'dario', x: 340, mood: 'happy', flip: true }], extras: E.croissants(205, 214) + E.sparkle(18, 150) + E.sparkle(386, 140),
+          bubbles: [{ x: 60, y: 8, w: 280, tail: 155, t: H('Grazie a tutti. Il merito è di chi prepara le camere ogni giorno.', 'Thank you all. The credit goes to the people who prepare the rooms every day.') }] },
+        note: { mod: 5, t: H('Riconoscere e riflettere', 'Recognise and reflect'), p: H('Chiudere un progetto significa anche ringraziare il team e chiedersi cosa ha funzionato. Le persone ricordano chi ha notato il loro lavoro.', 'Closing a project also means thanking the team and asking what worked. People remember who noticed their work.') } },
+      { cap: H('Tre mesi dopo, il signor Bianchi torna in hotel.', 'Three months later, Mr Bianchi comes back to the hotel.'),
+        panel: { scene: 'desk', chars: [DESK_D('happy', 'wave'), DESK_B('happy')], extras: E.clock(206, 120, '14:05'),
+          bubbles: [{ x: 10, y: 10, w: 190, tail: 110, t: H('Camera pronta alle 14? Tornerò volentieri.', 'Room ready at 2 pm? I\'ll gladly come back.') }, { x: 236, y: 30, w: 158, tail: 295, t: H('È un piacere riaverla qui!', 'It\'s a pleasure to have you back!') }] } }
+    ] }
+  ],
+  end: {
+    p: H('Il check-in delle 15 usa solo alcuni strumenti. Nel riassunto interattivo trovi tutto il corso Lean Six Sigma Black Belt, modulo per modulo, con un simulatore Cp/Cpk, il calcolo del takt time e molti altri esempi di hospitality.', 'The 3 pm check-in uses only a few tools. In the interactive summary you\'ll find the whole Lean Six Sigma Black Belt course, module by module, with a Cp/Cpk simulator, a takt time calculator and many more hospitality examples.'),
+    link: 'https://marvinbonazzo.github.io/lean-six-sigma-black-belt/',
+    fine: H('Storia, personaggi, disegni e numeri sono inventati per raccontare quello che ho imparato nel corso, finanziato dal Learning Budget di Bob W. Non affiliato con The Council for Six Sigma Certification. Marvin.', 'Story, characters, drawings and numbers are made up to tell what I learned in the course, funded by Bob W.\'s Learning Budget. Not affiliated with The Council for Six Sigma Certification. Marvin.')
+  }
+};
+
+init();
+</script>
+</body>
+</html>
