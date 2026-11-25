@@ -50,17 +50,18 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset
 .narr-c .nb::after{content:"";position:absolute;left:calc(50% - 7px);top:-11px;border:7px solid transparent;border-bottom:13px solid #fff;border-top:0}
 @media(max-width:600px){.narr-c{inset:-70px -4px;padding:0}.narr-c .av{width:76px}}
 /* bubbles appear one at a time */
-.bub{display:block;position:relative;max-width:100%;background:#fff;border:2.4px solid var(--ink);border-radius:16px;padding:7px 11px 8px;font-family:"Patrick Hand",Figtree,sans-serif;font-size:15.5px;line-height:1.2;color:var(--ink);opacity:0;transform:translateY(8px) scale(.96);transform-origin:var(--tx) 100%;transition:opacity .3s ease,transform .35s cubic-bezier(.2,.8,.2,1.2)}
+.panel{position:relative;container-type:inline-size}
+.bub{position:absolute;margin:0;background:#fff;border:max(1.5px,.6cqw) solid var(--ink);border-radius:4cqw;padding:1.75cqw 2.75cqw 2cqw;font-family:"Patrick Hand",Figtree,sans-serif;font-size:3.875cqw;line-height:1.2;color:var(--ink);opacity:0;transform:translateY(2cqw) scale(.96);transform-origin:var(--tx) 100%;transition:opacity .3s ease,transform .35s cubic-bezier(.2,.8,.2,1.2)}
 .bub.in{opacity:1;transform:none}
-@media(max-width:520px){.bub{font-size:17.5px;line-height:1.12;padding:6px 9px 7px}}
+@media(max-width:520px){.bub{font-size:4.4cqw;line-height:1.12;padding:1.5cqw 2.2cqw 1.7cqw}}
 .bub b{color:var(--acc);font-weight:400}
-.bub::before{content:"";position:absolute;left:calc(var(--tx) - 9px);bottom:-14px;border:9px solid transparent;border-top:14px solid var(--ink);border-bottom:0}
-.bub::after{content:"";position:absolute;left:calc(var(--tx) - 6px);bottom:-9.5px;border:6px solid transparent;border-top:10px solid #fff;border-bottom:0}
-.bub.think{border-radius:22px;border-style:dashed}
-.bub.think::before{width:10px;height:10px;border-radius:50%;border:2.4px solid var(--ink);background:#fff;left:calc(var(--tx) - 6px);bottom:-16px}
-.bub.think::after{width:6px;height:6px;border-radius:50%;border:2px solid var(--ink);background:#fff;left:calc(var(--tx) - 1px);bottom:-27px}
-.bub.shout{background:#fff4d6;border-width:3px}
-.plab{display:inline-block;background:var(--yel);border:2px solid var(--ink);border-radius:4px;padding:3px 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.bub::before{content:"";position:absolute;left:calc(var(--tx) - 2.25cqw);bottom:-3.5cqw;border:2.25cqw solid transparent;border-top:3.5cqw solid var(--ink);border-bottom:0}
+.bub::after{content:"";position:absolute;left:calc(var(--tx) - 1.5cqw);bottom:-2.35cqw;border:1.5cqw solid transparent;border-top:2.5cqw solid #fff;border-bottom:0}
+.bub.think{border-radius:5.5cqw;border-style:dashed}
+.bub.think::before{width:2.5cqw;height:2.5cqw;border-radius:50%;border:max(1.5px,.6cqw) solid var(--ink);background:#fff;left:calc(var(--tx) - 1.5cqw);bottom:-4cqw}
+.bub.think::after{width:1.5cqw;height:1.5cqw;border-radius:50%;border:max(1.2px,.5cqw) solid var(--ink);background:#fff;left:calc(var(--tx) - .25cqw);bottom:-6.75cqw}
+.bub.shout{background:#fff4d6;border-width:max(2px,.75cqw)}
+.plab{position:absolute;left:2.5%;top:3.8%;margin:0;background:var(--yel);border:max(1.5px,.5cqw) solid var(--ink);border-radius:1cqw;padding:.75cqw 2cqw;font-size:3cqw;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
 /* insight card over the dimmed scene */
 .dim{position:absolute;inset:0;background:rgba(12,10,8,.62);opacity:0;transition:opacity .4s ease;pointer-events:none;z-index:3}
 .ins{position:absolute;z-index:4;right:max(16px,5vw);top:50%;width:min(420px,calc(100% - 32px));background:#fff;color:var(--ink);border-radius:16px;padding:18px 20px 20px;box-shadow:0 30px 70px -20px rgba(0,0,0,.8);opacity:0;visibility:hidden;transform:translateY(calc(-50% + 16px));transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s .45s}
@@ -97,7 +98,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset
 .host.big .hello::after{left:calc(50% - 7px);top:-11px;border:7px solid transparent;border-bottom:13px solid #fff;border-top:0}
 @media(max-width:600px){.host.big .herofig{width:130px}}
 /* keyboard hint, always bottom right; lights up when someone tries something else */
-.hint{position:fixed;right:16px;bottom:72px;z-index:21;display:grid;justify-items:end;gap:8px;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease,visibility 0s .3s}
+.hint{position:fixed;right:16px;bottom:22px;z-index:21;display:grid;justify-items:end;gap:8px;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease,visibility 0s .3s}
 .hint.nudge{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease}
 .kb{width:118px;height:auto;display:block;transition:transform .2s}
 .hint .note-y{transform:rotate(-.6deg)}
@@ -105,8 +106,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset
 .hint.nudge .kb{animation:keybump .5s ease-in-out 4}
 @keyframes keyflash{50%{fill:#ffe14d}}
 @keyframes keybump{50%{transform:scale(1.08)}}
-.nav.nudge button:not(:disabled){animation:btnflash .5s ease-in-out 4}
-@keyframes btnflash{50%{background:rgba(255,225,77,.45)}}
 @media(hover:none) and (pointer:coarse){.hint .keys{display:none}}
 /* end */
 .endc{display:grid;justify-items:center;text-align:center;gap:16px;max-width:620px}
@@ -117,20 +116,12 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset
 .again{font:inherit;font-size:.95rem;color:var(--txt-soft);background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px}
 .fine{font-size:.76rem;line-height:1.5;color:rgba(244,239,230,.45);max-width:60ch}
 /* nav */
-.nav{position:fixed;right:max(10px,2vw);bottom:14px;display:flex;gap:6px;z-index:22}
-.nav button{width:50px;height:50px;border-radius:50%;border:0;background:none;color:var(--txt);cursor:pointer;display:grid;place-items:center;transition:background .2s,opacity .2s}
-.nav button svg{width:30px;height:30px}
-.nav button:hover:not(:disabled){background:rgba(255,255,255,.1)}
-.nav button:disabled{opacity:.25;cursor:default}
-.at-start #next{background:rgba(255,255,255,.12);animation:pulse 1.8s ease-out infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
-@media(prefers-reduced-motion:reduce){.narr-c,.narr-on .narr-c,.box::after,.scr,.scr.on,.dim,.ins,.insight .ins,.bub{transition:none}.bub{transform:none}.at-start #next,.hint.nudge .kb{animation:none}.prog{transition:none}}
+@media(prefers-reduced-motion:reduce){.narr-c,.narr-on .narr-c,.box::after,.scr,.scr.on,.dim,.ins,.insight .ins,.bub{transition:none}.bub{transform:none}.hint.nudge .kb{animation:none}.prog{transition:none}}
 </style>
 </head>
 <body class="at-start">
 <div class="topbar"><div class="lang" role="group" aria-label="Lingua / Language"><button type="button" data-lang="it" aria-pressed="true">IT</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div></div>
 <main id="story" aria-live="polite"></main>
-<nav class="nav"><button type="button" id="prev" aria-label="Indietro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" id="next" aria-label="Avanti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></nav>
 <div class="hint" id="hint" aria-hidden="true"></div>
 <div class="prog" id="prog"></div>
 <script>
@@ -278,18 +269,19 @@ const E = {
 // ---------- rendering ----------
 let BK = 0; // running bubble number inside a scene
 function bubble(b) {
-  const x = b.x, y = b.y, w = b.w || 170, h = 260 - y, tx = Math.max(18, Math.min(w - 18, (b.tail != null ? b.tail : x + w / 2) - x));
+  const x = b.x, y = b.y, w = b.w || 170, tx = Math.max(18, Math.min(w - 18, (b.tail != null ? b.tail : x + w / 2) - x));
   const cls = 'bub' + (b.think ? ' think' : '') + (b.shout ? ' shout' : '');
-  return `<foreignObject x="${x}" y="${y}" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" class="${cls}" data-k="${++BK}" style="--tx:${tx}px">${tr(b.t)}</div></foreignObject>`;
+  const pc = v => (v * 100).toFixed(3) + '%';
+  return `<div class="${cls}" data-k="${++BK}" style="left:${pc(x / 400)};top:${pc(y / 260)};width:${pc(w / 400)};--tx:${pc(tx / w)}">${tr(b.t)}</div>`;
 }
 function panel(p) {
   const sc = SC[p.scene || 'plain'];
   const bg = p.bgc || sc.bg;
   const chars = (p.chars || []).filter(ch => !ch.fore).map(ch => placed(ch, sc)).join('');
   const fore = (p.chars || []).filter(ch => ch.fore).map(ch => placed(ch, {})).join('');
-  const label = p.label ? `<foreignObject x="10" y="10" width="220" height="40"><div xmlns="http://www.w3.org/1999/xhtml" class="plab">${tr(p.label)}</div></foreignObject>` : '';
-  const svg = `<svg viewBox="0 0 400 260" role="img" aria-label="${esc((p.bubbles || []).map(b => tr(b.t).replace(/<[^>]+>/g, '')).join(' · '))}"><rect width="400" height="260" fill="${bg}"/>${sc.back()}${p.zoom ? `<g transform="translate(22 22) scale(1.48)">${tr(p.zoom)}</g>` : ''}${tr(p.behind) || ''}${chars}${sc.front()}${fore}${tr(p.extras) || ''}${(p.bubbles || []).map(bubble).join('')}${label}</svg>`;
-  return `<figure class="panel">${svg}</figure>`;
+  const label = p.label ? `<div class="plab">${tr(p.label)}</div>` : '';
+  const svg = `<svg viewBox="0 0 400 260" role="img" aria-label="${esc((p.bubbles || []).map(b => tr(b.t).replace(/<[^>]+>/g, '')).join(' · '))}"><rect width="400" height="260" fill="${bg}"/>${sc.back()}${p.zoom ? `<g transform="translate(22 22) scale(1.48)">${tr(p.zoom)}</g>` : ''}${tr(p.behind) || ''}${chars}${sc.front()}${fore}${tr(p.extras) || ''}</svg>`;
+  return `<figure class="panel">${svg}${(p.bubbles || []).map(bubble).join('')}${label}</figure>`;
 }
 
 // the narrator who tells the captions
@@ -297,10 +289,10 @@ const NARR = { skin: '#c99a72', hair: '#1d1612', style: 'mohawk', shades: true, 
 // ---------- story stage ----------
 const UI = {
   it: { principle: 'Il principio', mod: 'Modulo', chap: 'Capitolo', prev: 'Indietro', next: 'Avanti', dur: 'Durata', min: 'min',
-    keys: 'Usa le <b>frecce della tastiera</b> per vedere la storia!', touch: 'Tocca <b>›</b> o scorri con il dito per vedere la storia!', nudgeK: 'Usa <b>→</b> per andare avanti e <b>←</b> per tornare indietro', nudgeT: 'Tocca <b>›</b> per andare avanti e <b>‹</b> per tornare indietro',
+    keys: 'Usa le <b>frecce della tastiera</b> per vedere la storia!', touch: 'Scorri con il dito per vedere la storia!', nudgeK: 'Usa <b>→</b> per andare avanti e <b>←</b> per tornare indietro', nudgeT: 'Scorri verso <b>sinistra</b> per andare avanti, verso <b>destra</b> per tornare indietro',
     more: 'Vuoi saperne di più?', open: 'Apri il riassunto interattivo', again: '↺ Ricomincia' },
   en: { principle: 'The principle', mod: 'Module', chap: 'Chapter', prev: 'Back', next: 'Next', dur: 'Duration', min: 'min',
-    keys: 'Use your <b>keyboard arrows</b> to view the story!', touch: 'Tap <b>›</b> or swipe to view the story!', nudgeK: 'Use <b>→</b> to go forward and <b>←</b> to go back', nudgeT: 'Tap <b>›</b> to go forward and <b>‹</b> to go back',
+    keys: 'Use your <b>keyboard arrows</b> to view the story!', touch: 'Swipe to view the story!', nudgeK: 'Use <b>→</b> to go forward and <b>←</b> to go back', nudgeT: 'Swipe <b>left</b> to go forward, <b>right</b> to go back',
     more: 'Want to know more?', open: 'Open the interactive summary', again: '↺ Start again' }
 };
 const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -345,7 +337,6 @@ function render() {
   const mins = Math.max(2, Math.round(STEPS.length * 4.5 / 60));
   document.getElementById('story').innerHTML = html.replace('<p class="dur"></p>', `<p class="dur"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>${UI[LANG].dur}: ${mins} ${UI[LANG].min}</p>`);
   document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
-  const u = UI[LANG]; document.getElementById('prev').setAttribute('aria-label', u.prev); document.getElementById('next').setAttribute('aria-label', u.next);
   document.getElementById('hint').innerHTML = `<div class="keys">${KEYS}</div><p class="note-y" id="hintnote"></p>`;
   CUR = Math.min(CUR, STEPS.length - 1); SHOWN = -1; apply();
 }
@@ -353,9 +344,9 @@ const TOUCH = matchMedia('(hover: none) and (pointer: coarse)').matches;
 function hintText(nudging) { const u = UI[LANG]; document.getElementById('hintnote').innerHTML = nudging ? (TOUCH ? u.nudgeT : u.nudgeK) : (TOUCH ? u.touch : u.keys); }
 let nudgeT = 0;
 function nudge() {
-  const h = document.getElementById('hint'), n = document.querySelector('.nav');
-  hintText(true); h.classList.remove('nudge'); n.classList.remove('nudge'); void h.offsetWidth; h.classList.add('nudge'); n.classList.add('nudge');
-  clearTimeout(nudgeT); nudgeT = setTimeout(() => { h.classList.remove('nudge'); n.classList.remove('nudge'); if (CUR === 0) hintText(false); }, 2600);
+  const h = document.getElementById('hint');
+  hintText(true); h.classList.remove('nudge'); void h.offsetWidth; h.classList.add('nudge');
+  clearTimeout(nudgeT); nudgeT = setTimeout(() => h.classList.remove('nudge'), 2600);
 }
 function apply() {
   const st = STEPS[CUR], all = document.querySelectorAll('.scr');
@@ -364,8 +355,6 @@ function apply() {
   scr.querySelectorAll('.bub[data-k]').forEach(b => b.classList.toggle('in', +b.dataset.k <= st.k));
   scr.classList.toggle('insight', !!st.ins);
   scr.classList.toggle('narr-on', !!st.narr);
-  document.getElementById('prev').disabled = CUR === 0;
-  document.getElementById('next').disabled = CUR === STEPS.length - 1;
   document.body.classList.toggle('at-start', CUR === 0);
   if (!document.getElementById('hint').classList.contains('nudge')) hintText(false);
   document.getElementById('prog').style.transform = `scaleX(${STEPS.length > 1 ? CUR / (STEPS.length - 1) : 0})`;
@@ -381,8 +370,7 @@ function init() {
     try { history.replaceState(null, '', '#' + LANG); } catch (e) {}
     render();
   }));
-  document.getElementById('prev').addEventListener('click', () => go(CUR - 1));
-  document.getElementById('next').addEventListener('click', () => go(CUR + 1));
+  const jump = +new URLSearchParams(location.search).get('step'); if (jump > 0) CUR = jump;
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) { go(+g.dataset.go); return; }
     if (!TOUCH && !e.target.closest('button, a, .lang')) nudge();

@@ -10,7 +10,7 @@ The idea: every tool is applied twice, once to hospitality processes and once to
 
 ## The comic
 
-The same lessons told as a short comic, step by step: [lean-six-sigma-black-belt/fumetto.html](https://marvinbonazzo.github.io/lean-six-sigma-black-belt/fumetto.html) (Italian and English, use the ← → arrow keys or swipe). The story, characters and drawings are made up.
+The same lessons told as a short comic, step by step: [lean-six-sigma-black-belt/fumetto.html](https://marvinbonazzo.github.io/lean-six-sigma-black-belt/fumetto.html) (Italian and English; use the ← → arrow keys, or swipe on a phone). The story, characters and drawings are made up.
 
 ## What's inside
 
