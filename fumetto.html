@@ -99,7 +99,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset
 @media(max-width:600px){.host.big .herofig{width:130px}}
 /* keyboard hint, always bottom right; lights up when someone tries something else */
 .hint{position:fixed;right:16px;bottom:22px;z-index:21;display:grid;justify-items:end;gap:8px;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease,visibility 0s .3s}
-.hint.nudge{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease}
+.hint.nudge,.at-start .hint{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease}
+.at-start .hint:not(.nudge) .kr{animation:keyflash 1.4s ease-in-out infinite}
 .kb{width:118px;height:auto;display:block;transition:transform .2s}
 .hint .note-y{transform:rotate(-.6deg)}
 .hint.nudge .kl,.hint.nudge .kr{animation:keyflash .5s ease-in-out 4}
